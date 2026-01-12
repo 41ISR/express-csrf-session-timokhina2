@@ -3,13 +3,15 @@ import { useEffect } from "react"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuthStore } from "../store/useAuthStore"
+import useAppStore from "../store/useAppStore"
 
 const Index = () => {
     const navigate = useNavigate()
     const formRef = useRef(null)
     const {user} = useAuthStore()
-    const [clicks, setClicks] = useState(0)
-    const clickRef = useRef(null)
+    const {currentClicks, setCurrentClicks} = useAppStore()
+    // const [clicks, setClicks] = useState(0)
+    // const clickRef = useRef(null)
     useEffect(() => {
         const interval = setInterval(() => {
             formRef.current && handleSubmit()
@@ -17,15 +19,16 @@ const Index = () => {
         return () => {clearInterval(interval)}
     }, [])
 
-    useEffect(() => {
-        clickRef.current = clicks
-    }, [clicks])
+
+    // useEffect(() => {
+    //     clickRef.current = clicks
+    // }, [clicks])
 
     useEffect(() => {
-        setClicks(user.user.clicks)
+        setCurrentClicks(user.user.clicks)
     }, [user])
     const handleClick = () => {
-        setClicks((val) => val + 1)
+        setCurrentClicks(currentClicks + 1)
     }
 
     const handleLogout = () => {
@@ -64,7 +67,7 @@ const Index = () => {
 
                 <div className="click-counter">
                     <h2>Твои клики</h2>
-                    <div className="clicks-display">{clicks}</div>
+                    <div className="clicks-display">{currentClicks}</div>
                     <form onSubmit={(e) => e.preventDefault()} ref={formRef}>
                             <button className="click-button" onClick={handleClick}>👆 КЛИКНИ!</button>
                     </form>
