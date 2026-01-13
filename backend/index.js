@@ -1,4 +1,5 @@
 const db = require("./db")
+const csrf = require("csurf")
 const express = require("express")
 const cors = require("cors")
 const bcrypt = require("bcrypt")
@@ -33,13 +34,25 @@ app.use(session({
     }
 }))
 
+const csrfMiddleware = csrf({
+    cookie: {
+        httpOnly: false,
+        sameSite: "none",
+        secure: true,
+        domain: undefined
+    }
+})
+
 app.get("/auth/me", (req, res) => {
-    console.log(req.session)
+    const { clicks } = db.prepare(
+        "SELECT clicks FROM users WHERE id = ?"
+    ).get(req.session.userId) || 0
+
     if (req.session.userId) {
         return res.status(200).json({logged: true, user: {
             userId: req.session.userId,
             email: req.session.email,
-            clicks: req.session.clicks || 0
+            clicks: clicks
         }})
     }
 
@@ -97,14 +110,38 @@ app.post("/auth/logout", (req, res) => {
     })
 })
 
-app.post("/click", (req, res) => {
-    const { clicks } = req.body
+app.post("/click", csrfMiddleware, (req, res) => {
+
+    try {
+        const { clicks } = req.body
     const updateClicks = db
         .prepare("UPDATE users SET clicks = ? WHERE id = ?")
         .run(clicks, req.session.userId)
 
-    console.log(updateClicks)
     res.status(200).json({message: "Значение кликов обновлено"})
+    } catch (error) {
+        console.error(error);
+        
+    }
+    
+})
+
+app.get("/leaderboard", (req, res) => {
+    const users = db.prepare(
+        "SELECT * FROM users ORDER BY clicks DESC LIMIT 10"
+    ).all()
+
+    const sanitizedUsers = users.map((el) => {
+        const {createdAt, password, ...newUser} = el
+        return newUser
+    })
+
+    res.status(200).json(sanitizedUsers)
+})
+
+
+app.get("/csrf-token", csrfMiddleware, (req, res) => {
+    res.json({token: req.csrfToken()})
 })
 
 app.listen("3000", () => {
