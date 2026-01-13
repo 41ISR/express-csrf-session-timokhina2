@@ -1,6 +1,5 @@
 import { useRef } from "react"
 import { useEffect } from "react"
-import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuthStore } from "../store/useAuthStore"
 import useAppStore from "../store/useAppStore"
@@ -9,21 +8,16 @@ import Leaderboard from "../components/Leaderboard"
 const Index = () => {
     const navigate = useNavigate()
     const formRef = useRef(null)
-    const {user} = useAuthStore()
+    const {user, getCsrfToken, csrfToken} = useAuthStore()
     const {currentClicks, setCurrentClicks} = useAppStore()
-    // const [clicks, setClicks] = useState(0)
-    // const clickRef = useRef(null)
     useEffect(() => {
+        getCsrfToken()
+
         const interval = setInterval(() => {
             formRef.current && handleSubmit()
         }, 5000)
         return () => {clearInterval(interval)}
     }, [])
-
-
-    // useEffect(() => {
-    //     clickRef.current = clicks
-    // }, [clicks])
 
     useEffect(() => {
         setCurrentClicks(user.user.clicks)
@@ -43,9 +37,10 @@ const Index = () => {
                     method: "POST",
                     credentials: "include",
                     headers: {
+                        "X-CSRF-Token": useAuthStore.getState().csrfToken,
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({clicks: clickRef.current})
+                    body: JSON.stringify({clicks: useAppStore.getState().currentClicks})
                 }
             )
             const data = await res.json()
@@ -60,7 +55,7 @@ const Index = () => {
             <div className="header">
                 <h1>🎮 Кликер Игра</h1>
                 <div className="user-info">
-                    <span><strong>Имя пользователя</strong></span>
+                    <span><strong>{user.user.email}</strong></span>
                     <button onClick={handleLogout} className="logout-btn">Выйти</button>
                 </div>
             </div>

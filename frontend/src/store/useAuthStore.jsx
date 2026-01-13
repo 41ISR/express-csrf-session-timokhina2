@@ -20,6 +20,24 @@ export const useAuthStore = create((set, get) => ({
         }
     },
     clearUser: () => {
-        set((state) => ({...state, user: undefined}))
+        set((state) => ({ ...state, user: undefined }))
+    },
+    csrfToken: undefined,
+    getCsrfToken: async () => {
+        try {
+            const res = await fetch("https://shiny-broccoli-7r4gg65p9gr2xxr6-3000.app.github.dev/csrf-token", {
+                credentials: "include"
+            })
+
+            if (!res.ok) throw new Error(res.error)
+
+            const data = await res.json()
+
+            if (!data) return
+
+            set((state) => ({ ...state, csrfToken: data.token }))
+        } catch (error) {
+            console.error(error)
+        }
     }
 }))
