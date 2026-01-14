@@ -6,7 +6,7 @@ const Leaderboard = () => {
 
     const updateLeaderboard = async () => {
         try {
-            const res = await fetch("https://shiny-broccoli-7r4gg65p9gr2xxr6-3000.app.github.dev/leaderboard")
+            const res = await fetch("https://scaling-broccoli-wvgvpr77j6hgwpr-3000.app.github.dev/leaderboard")
             const data = await res.json()
             setLeaderboard(data)
         } catch (err) {

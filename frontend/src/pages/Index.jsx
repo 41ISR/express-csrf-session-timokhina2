@@ -32,7 +32,7 @@ const Index = () => {
 
     const handleSubmit = async () => {
         try {
-            const res = await fetch("https://shiny-broccoli-7r4gg65p9gr2xxr6-3000.app.github.dev/click",
+            const res = await fetch("https://scaling-broccoli-wvgvpr77j6hgwpr-3000.app.github.dev/click",
                 {
                     method: "POST",
                     credentials: "include",

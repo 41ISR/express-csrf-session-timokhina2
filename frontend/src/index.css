@@ -111,6 +111,19 @@ h1 {
 .form-card button:active {
   transform: translateY(0);
 }
+a.form-link{
+  text-decoration: none;
+  color: black;
+}
+
+.form-link{
+  flex: content;
+  flex-direction: column;
+}
+
+.form-error{
+  
+}
 
 /* Тестовые аккаунты */
 .test-accounts {
